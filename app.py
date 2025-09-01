@@ -141,4 +141,8 @@ def index():
 
 
 if __name__ == "__main__":
-    app.run(debug=True)
+    app.run(
+        host="0.0.0.0",                     # bind to all interfaces
+        port=int(os.environ.get("PORT", 5000)),  # use Render’s PORT or fallback 5000 locally
+        debug=True
+    )
