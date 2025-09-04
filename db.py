@@ -1,22 +1,21 @@
-import sqlite3
+import os
+import psycopg2
 
-DB_FILE = "gold_rates.db"
+DATABASE_URL = os.environ.get("DATABASE_URL")
 
 def get_connection():
-    return sqlite3.connect(DB_FILE)
+    return psycopg2.connect(DATABASE_URL)
 
 def init_db():
     conn = get_connection()
     cur = conn.cursor()
     cur.execute("""
         CREATE TABLE IF NOT EXISTS gold_rates (
-            id INTEGER PRIMARY KEY,
-            rate REAL NOT NULL,
+            id SERIAL PRIMARY KEY,
+            rate NUMERIC NOT NULL,
             updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
         )
     """)
-    # Ensure a single row with id=1 exists
-    cur.execute("INSERT OR IGNORE INTO gold_rates (id, rate) VALUES (1, 0)")
     conn.commit()
     cur.close()
     conn.close()

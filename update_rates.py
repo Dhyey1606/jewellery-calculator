@@ -40,47 +40,37 @@
 #     update_config()
 import requests
 from bs4 import BeautifulSoup
-import sqlite3
+import psycopg2
+import os
 from datetime import datetime
 
-DB_FILE = "gold_rates.db"
+DATABASE_URL = os.environ.get("DATABASE_URL")
 
 def fetch_gold_rate():
     url = "https://www.angelone.in/gold-rates-today/gold-rate-in-ahmedabad"
     headers = {"User-Agent": "Mozilla/5.0"}
     response = requests.get(url, headers=headers)
-
-    if response.status_code != 200:
-        raise Exception(f"Failed to fetch page: {response.status_code}")
-
     soup = BeautifulSoup(response.text, "html.parser")
     gold_element = soup.find("div", {"class": "_7_GedP"})
-    if not gold_element:
-        raise Exception("Could not find gold rate element on page")
-
     rate_text = gold_element.get_text(strip=True)
     rate_for_10g = float(rate_text.replace(",", "").replace("₹", "").strip())
-    return rate_for_10g / 10  # per gram
-
+    return rate_for_10g / 10
 
 def update_database():
     rate = fetch_gold_rate()
-    conn = sqlite3.connect(DB_FILE)
+    conn = psycopg2.connect(DATABASE_URL)
     cur = conn.cursor()
-
-    # overwrite the single row
     cur.execute("""
         INSERT INTO gold_rates (id, rate, updated_at)
-        VALUES (1, ?, ?)
-        ON CONFLICT(id) DO UPDATE SET
-            rate = excluded.rate,
-            updated_at = excluded.updated_at
+        VALUES (1, %s, %s)
+        ON CONFLICT (id) DO UPDATE
+        SET rate = EXCLUDED.rate,
+            updated_at = EXCLUDED.updated_at
     """, (rate, datetime.now()))
-
     conn.commit()
+    cur.close()
     conn.close()
-    print(f"✅ Updated gold_rate in DB → {rate} per gram at {datetime.now()}")
-
+    print(f"✅ Updated gold_rate → {rate}")
 
 if __name__ == "__main__":
     update_database()

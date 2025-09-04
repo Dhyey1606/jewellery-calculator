@@ -93,7 +93,7 @@ from flask import Flask, render_template, request
 import os
 import subprocess
 import sqlite3
-from db import init_db
+from db import init_db, get_connection
 
 # init db on app start
 init_db()
@@ -104,12 +104,12 @@ DB_FILE = "gold_rates.db"
 
 # Fetch latest gold rate from DB
 def get_latest_gold_rate():
-    conn = sqlite3.connect(DB_FILE)
+    conn = get_connection()
     cur = conn.cursor()
-    cur.execute("SELECT rate FROM gold_rates WHERE id=1")
+    cur.execute("SELECT rate FROM gold_rates ORDER BY updated_at DESC LIMIT 1")
     row = cur.fetchone()
     conn.close()
-    return row[0] if row else None
+    return float(row[0]) if row else None
 
 
 # Constants
