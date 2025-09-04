@@ -89,33 +89,27 @@
 #         debug=True
 #     )
 
-
 from flask import Flask, render_template, request
-import json
 import os
 import subprocess
+import sqlite3
+from db import init_db
+
+# init db on app start
+init_db()
 
 app = Flask(__name__)
-
-CONFIG_FILE = "config.json"
 SECRET_KEY = "mysecret123"  # 🔒 keep safe
+DB_FILE = "gold_rates.db"
 
-# Helper function to load config
-def load_config():
-    if not os.path.exists(CONFIG_FILE):
-        raise FileNotFoundError(f"{CONFIG_FILE} not found! Please create it.")
-    with open(CONFIG_FILE, "r") as f:
-        return json.load(f)
-
-
-# Load gold rate on startup
-config = load_config()
-GOLD_RATE = config.get("gold_rate")
-if GOLD_RATE is None:
-    GOLD_RATE = float(input("Enter current gold rate per gram: "))
-    config["gold_rate"] = GOLD_RATE
-    with open(CONFIG_FILE, "w") as f:
-        json.dump(config, f, indent=4)
+# Fetch latest gold rate from DB
+def get_latest_gold_rate():
+    conn = sqlite3.connect(DB_FILE)
+    cur = conn.cursor()
+    cur.execute("SELECT rate FROM gold_rates WHERE id=1")
+    row = cur.fetchone()
+    conn.close()
+    return row[0] if row else None
 
 
 # Constants
@@ -143,7 +137,9 @@ def index():
     diamond_rate_selected = None
     diamond_rate_manual = None
 
-    if request.method == "POST":
+    GOLD_RATE = get_latest_gold_rate()
+
+    if request.method == "POST" and GOLD_RATE:
         try:
             weight = float(request.form.get("weight", 0))
             purity_selected = request.form.get("purity", "24K")
@@ -175,7 +171,7 @@ def index():
     )
 
 
-# 🔹 New route to trigger update_rates.py (for cron-job.org)
+# 🔹 Cron trigger
 @app.route("/update-rates")
 def update_rates():
     key = request.args.get("key")
@@ -183,15 +179,9 @@ def update_rates():
         return "Unauthorized", 403
 
     try:
-        # Run the update_rates.py script
         subprocess.run(["python", "update_rates.py"], check=True)
-
-        # Reload config
-        global GOLD_RATE
-        config = load_config()
-        GOLD_RATE = config.get("gold_rate", GOLD_RATE)
-
-        return f"✅ Gold rate updated to ₹{GOLD_RATE}/gram", 200
+        new_rate = get_latest_gold_rate()
+        return f"✅ Gold rate updated to ₹{new_rate}/gram", 200
     except Exception as e:
         return f"❌ Error updating rate: {e}", 500
 
