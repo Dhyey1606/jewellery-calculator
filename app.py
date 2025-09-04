@@ -185,6 +185,19 @@ def update_rates():
     except Exception as e:
         return f"❌ Error updating rate: {e}", 500
 
+@app.route("/debug-db")
+def debug_db():
+    try:
+        import psycopg2, os
+        conn = psycopg2.connect(os.environ["DATABASE_URL"], sslmode="require")
+        cur = conn.cursor()
+        cur.execute("SELECT * FROM gold_rates ORDER BY updated_at DESC LIMIT 5;")
+        rows = cur.fetchall()
+        cur.close()
+        conn.close()
+        return {"rows": rows}
+    except Exception as e:
+        return {"error": str(e)}
 
 if __name__ == "__main__":
     app.run(
