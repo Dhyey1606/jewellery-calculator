@@ -37,9 +37,7 @@
 #     update_database()
 
 
-# update_rates.py
 import requests
-import re
 import psycopg2
 import os
 
@@ -47,15 +45,16 @@ DATABASE_URL = os.environ.get("DATABASE_URL")
 
 def fetch_gold_rate():
     url = "https://bcast.arhambullion.in:7768/VOTSBroadcastStreaming/Services/xml/GetLiveRateByTemplateID/arham"
-    response = requests.get(url, verify=False, timeout=10)  # disable SSL verify if needed
+    response = requests.get(url, verify=False, timeout=10)
     data = response.text
 
     # Find the row containing "GOLD 999 IMP"
     for line in data.splitlines():
         if "GOLD 999 IMP" in line:
             parts = line.split()
-            # `parts[8]` is the value you tested
-            return float(parts[8])
+            raw_rate = float(parts[8])   # value is for 10 grams
+            per_gram_rate = raw_rate / 10
+            return round(per_gram_rate, 2)   # round to 2 decimals
 
     raise ValueError("Could not find GOLD 999 IMP value in response")
 
@@ -70,4 +69,4 @@ def save_rate_to_db(rate):
 if __name__ == "__main__":
     rate = fetch_gold_rate()
     save_rate_to_db(rate)
-    print(f"✅ Saved new GOLD 999 IMP rate: {rate}")
+    print(f"✅ Saved new GOLD 999 IMP rate per gram: {rate}")
