@@ -1,156 +1,4 @@
-<!-- <!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Beyond Karat</title>
-    <style>
-        /* Reset */
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-
-        body {
-            font-family: "Poppins", sans-serif;
-            background: linear-gradient(to right, #fff8f0, #fffefb);
-            color: #333;
-            min-height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            padding: 30px;
-        }
-
-        .container {
-            background: #fff;
-            padding: 30px 40px;
-            border-radius: 15px;
-            max-width: 600px;
-            width: 100%;
-            box-shadow: 0px 6px 18px rgba(0, 0, 0, 0.1);
-            text-align: center;
-        }
-
-        h1 {
-            font-size: 2.2rem;
-            margin-bottom: 15px;
-            color: #a47c48;
-            letter-spacing: 1px;
-        }
-
-        p { margin-bottom: 25px; color: #555; }
-
-        form {
-            display: flex;
-            flex-direction: column;
-            gap: 18px;
-            text-align: left;
-        }
-
-        label { font-weight: 600; margin-bottom: 5px; color: #444; }
-
-        input, select {
-            padding: 12px;
-            border: 1px solid #ddd;
-            border-radius: 8px;
-            outline: none;
-            font-size: 1rem;
-            transition: border 0.2s;
-        }
-
-        input:focus, select:focus { border: 1px solid #a47c48; }
-
-        button {
-            background: linear-gradient(135deg, #b69155, #a47c48);
-            color: white;
-            padding: 12px;
-            border: none;
-            border-radius: 8px;
-            font-size: 1.1rem;
-            cursor: pointer;
-            transition: transform 0.2s, background 0.3s;
-        }
-
-        button:hover {
-            transform: scale(1.05);
-            background: linear-gradient(135deg, #caa567, #a47c48);
-        }
-
-        .result {
-            margin-top: 25px;
-            padding: 18px;
-            border-radius: 12px;
-            background: #fff8f0;
-            border: 1px solid #f1e3d3;
-            font-size: 1.2rem;
-            color: #333;
-            font-weight: 600;
-            text-align: center;
-        }
-    </style>
-</head>
-<body>
-    <div class="container">
-        <h1>Beyond Karat</h1>
-        <p>Jewellery Price Calculator</p>
-
-    <form method="POST">
-    <label for="weight">Gold Weight (grams):</label>
-    <input type="number" step="0.01" id="weight" name="weight" required
-        value="{{ request.form.get('weight', '') }}">
-
-    <label for="purity">Select Purity:</label>
-    <select id="purity" name="purity" required>
-        {% for k, v in purity_multipliers.items() %}
-        <option value="{{ k }}" {% if request.form.get('purity') == k %}selected{% endif %}>{{ k }}</option>
-        {% endfor %}
-    </select>
-
-    <label for="diamond_rate_option">Diamond Rate Option:</label>
-    <select id="diamond_rate_option" name="diamond_rate_option" required onchange="toggleManualDiamond(this.value)">
-        {% for k, v in diamond_rates.items() %}
-        <option value="{{ k }}" {% if request.form.get('diamond_rate_option') == k %}selected{% endif %}>
-            {{ k }}
-        </option>
-        {% endfor %}
-    </select>
-
-    <div id="manual_diamond_div" style="display: none; margin-top:10px;">
-        <label for="diamond_rate_manual">Enter Diamond Rate Manually:</label>
-        <input type="number" step="0.01" id="diamond_rate_manual" name="diamond_rate_manual"
-            value="{{ request.form.get('diamond_rate_manual', '') }}">
-    </div>
-
-    <label for="diamond_carat">Diamond Weight (carats):</label>
-    <input type="number" step="0.01" id="diamond_carat" name="diamond_carat" required
-        value="{{ request.form.get('diamond_carat', '') }}">
-
-    <button type="submit">Calculate</button>
-</form>
-
-{% if total_price %}
-<div class="result">
-💎 Estimated Price: ₹ {{ total_price }}<br>
-(Purity: {{ purity }}, Gold Rate/g: ₹ {{ gold_rate }})
-</div>
-{% endif %}
-
-<script>
-function toggleManualDiamond(value) {
-    const manualDiv = document.getElementById('manual_diamond_div');
-    if (value === "Manual") {
-        manualDiv.style.display = 'block';
-    } else {
-        manualDiv.style.display = 'none';
-    }
-}
-
-// Initialize display on page load
-document.addEventListener("DOMContentLoaded", function() {
-    toggleManualDiamond(document.getElementById('diamond_rate_option').value);
-});
-</script>
-
-</body>
-</html> -->
-
+<!-- 
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -310,4 +158,165 @@ document.addEventListener("DOMContentLoaded", function() {
 </script>
 </body>
 </html>
+ -->
 
+
+ <!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Beyond Karat</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: "Poppins", sans-serif;
+            background: linear-gradient(to right, #fff8f0, #fffefb);
+            color: #333;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .container {
+            background: #fff;
+            padding: 20px 25px;
+            border-radius: 15px;
+            width: 100%;
+            max-width: 650px;
+            box-shadow: 0px 6px 18px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+
+        h1 {
+            font-size: 2rem;
+            margin-bottom: 10px;
+            color: #a47c48;
+        }
+
+        p { margin-bottom: 20px; color: #555; font-size: 1rem; }
+
+        form {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            text-align: left;
+        }
+
+        label { font-weight: 600; margin-bottom: 5px; color: #444; font-size: 0.95rem; }
+
+        input, select {
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            outline: none;
+            font-size: 1rem;
+            width: 100%;
+        }
+
+        input:focus, select:focus { border: 1px solid #a47c48; }
+
+        button {
+            background: linear-gradient(135deg, #b69155, #a47c48);
+            color: white;
+            padding: 12px;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: transform 0.2s, background 0.3s;
+            width: 100%;
+        }
+
+        button:hover {
+            transform: scale(1.02);
+            background: linear-gradient(135deg, #caa567, #a47c48);
+        }
+
+        .result {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 12px;
+            background: #fff8f0;
+            border: 1px solid #f1e3d3;
+            font-size: 1rem;
+            color: #333;
+            font-weight: 600;
+            text-align: left;
+        }
+
+        .result strong { color: #a47c48; }
+
+        /* 📱 Mobile tweaks */
+        @media (max-width: 480px) {
+            h1 { font-size: 1.6rem; }
+            p { font-size: 0.9rem; }
+            label { font-size: 0.85rem; }
+            input, select, button { font-size: 0.95rem; padding: 10px; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Beyond Karat</h1>
+        <p>Jewellery Price Calculator</p>
+
+        <form method="POST">
+            <label for="weight">Gold Weight (grams):</label>
+            <input type="number" step="0.01" id="weight" name="weight" required
+                value="{{ request.form.get('weight', '') }}">
+
+            <label for="purity">Select Purity:</label>
+            <select id="purity" name="purity" required>
+                {% for k, v in purity_multipliers.items() %}
+                <option value="{{ k }}" {% if purity == k %}selected{% endif %}>{{ k }}</option>
+                {% endfor %}
+            </select>
+
+            <label for="diamond_rate_option">Diamond Rate Option:</label>
+            <select id="diamond_rate_option" name="diamond_rate_option" required onchange="toggleManualDiamond(this.value)">
+                {% for k, v in diamond_rates.items() %}
+                <option value="{{ k }}" {% if diamond_rate_option == k %}selected{% endif %}>
+                    {{ k }}
+                </option>
+                {% endfor %}
+            </select>
+
+            <div id="manual_diamond_div" style="display: none; margin-top:10px;">
+                <label for="diamond_rate_manual">Enter Diamond Rate Manually:</label>
+                <input type="number" step="0.01" id="diamond_rate_manual" name="diamond_rate_manual"
+                    value="{{ request.form.get('diamond_rate_manual', '') }}">
+            </div>
+
+            <label for="diamond_carat">Diamond Weight (carats):</label>
+            <input type="number" step="0.01" id="diamond_carat" name="diamond_carat" required
+                value="{{ request.form.get('diamond_carat', '') }}">
+
+            <button type="submit">Calculate</button>
+        </form>
+
+        {% if total_price %}
+        <div class="result">
+            <p><strong>💎 Estimated Price:</strong> ₹ {{ "%.2f"|format(total_price) }}</p>
+            <p>Gold Rate (24K): ₹ {{ "%.2f"|format(latest_gold_rate) }}/g</p>
+            <p>Purity: {{ purity }} (Effective Gold Rate: ₹ {{ "%.2f"|format(gold_rate) }}/g)</p>
+            <p>Diamond Rate: ₹ {{ "%.2f"|format(diamond_rate) }}/ct × {{ diamond_carat }}ct</p>
+            <p>Labour Charge: ₹ {{ "%.2f"|format(labour_charge) }} × {{ weight }}g</p>
+        </div>
+        {% endif %}
+    </div>
+
+<script>
+function toggleManualDiamond(value) {
+    const manualDiv = document.getElementById('manual_diamond_div');
+    manualDiv.style.display = (value === "Manual") ? 'block' : 'none';
+}
+document.addEventListener("DOMContentLoaded", function() {
+    toggleManualDiamond(document.getElementById('diamond_rate_option').value);
+});
+</script>
+</body>
+</html>

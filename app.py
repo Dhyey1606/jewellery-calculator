@@ -3,6 +3,7 @@
 # import os
 # import subprocess
 # import sqlite3
+# import sys
 # from db import init_db, get_connection
 
 # # init db on app start
@@ -62,10 +63,11 @@
 #             else:
 #                 diamond_rate_selected = DIAMOND_RATES.get(diamond_rate_key, 0)
 
-#             gold_rate_per_gram = GOLD_RATE * PURITY_MULTIPLIERS.get(purity_selected, 1.0)
-#             gold_price = weight * gold_rate_per_gram
-#             diamond_price = diamond_carat * diamond_rate_selected
-#             total_price = gold_price + diamond_price + (LABOUR_CHARGE * weight)
+#             # Round to 2 decimals at calculation stage
+#             gold_rate_per_gram = round(GOLD_RATE * PURITY_MULTIPLIERS.get(purity_selected, 1.0), 2)
+#             gold_price = round(weight * gold_rate_per_gram, 2)
+#             diamond_price = round(diamond_carat * diamond_rate_selected, 2)
+#             total_price = round(gold_price + diamond_price + (LABOUR_CHARGE * weight), 2)
 
 #         except Exception as e:
 #             total_price = f"Error: {str(e)}"
@@ -89,16 +91,17 @@
 #         return "Unauthorized", 403
 
 #     try:
-#         subprocess.run(["python", "update_rates.py"], check=True)
+#         subprocess.run([sys.executable, "update_rates.py"], check=True)
 #         new_rate = get_latest_gold_rate()
-#         return f"✅ Gold rate updated to ₹{new_rate}/gram", 200
+#         return f"✅ Gold rate updated to ₹{new_rate:.2f}/gram", 200
 #     except Exception as e:
 #         return f"❌ Error updating rate: {e}", 500
+
 
 # @app.route("/debug-db")
 # def debug_db():
 #     try:
-#         import psycopg2, os
+#         import psycopg2
 #         conn = psycopg2.connect(os.environ["DATABASE_URL"], sslmode="require")
 #         cur = conn.cursor()
 #         cur.execute("SELECT * FROM gold_rates ORDER BY updated_at DESC LIMIT 5;")
@@ -108,6 +111,7 @@
 #         return {"rows": rows}
 #     except Exception as e:
 #         return {"error": str(e)}
+
 
 # if __name__ == "__main__":
 #     app.run(
@@ -162,42 +166,51 @@ PURITY_MULTIPLIERS = {
 def index():
     total_price = None
     gold_rate_per_gram = None
-    purity_selected = None
-    diamond_rate_selected = None
-    diamond_rate_manual = None
+    purity_selected = request.form.get("purity") if request.method == "POST" else None
+    diamond_rate_option = request.form.get("diamond_rate_option") if request.method == "POST" else None
+    diamond_rate_used = None
+    diamond_carat = 0
+    weight = 0
 
-    GOLD_RATE = get_latest_gold_rate()
+    latest_gold_rate = get_latest_gold_rate()
 
-    if request.method == "POST" and GOLD_RATE:
+    if request.method == "POST" and latest_gold_rate:
         try:
             weight = float(request.form.get("weight", 0))
             purity_selected = request.form.get("purity", "24K")
             diamond_carat = float(request.form.get("diamond_carat", 0))
 
-            diamond_rate_key = request.form.get("diamond_rate_option")
-            if diamond_rate_key == "Manual":
-                diamond_rate_manual = float(request.form.get("diamond_rate_manual", 0))
-                diamond_rate_selected = diamond_rate_manual
+            # Diamond rate selection
+            if diamond_rate_option == "Manual":
+                diamond_rate_used = float(request.form.get("diamond_rate_manual", 0))
             else:
-                diamond_rate_selected = DIAMOND_RATES.get(diamond_rate_key, 0)
+                diamond_rate_used = DIAMOND_RATES.get(diamond_rate_option, 0)
 
-            # Round to 2 decimals at calculation stage
-            gold_rate_per_gram = round(GOLD_RATE * PURITY_MULTIPLIERS.get(purity_selected, 1.0), 2)
+            # Calculate prices
+            gold_rate_per_gram = round(latest_gold_rate * PURITY_MULTIPLIERS.get(purity_selected, 1.0), 2)
             gold_price = round(weight * gold_rate_per_gram, 2)
-            diamond_price = round(diamond_carat * diamond_rate_selected, 2)
-            total_price = round(gold_price + diamond_price + (LABOUR_CHARGE * weight), 2)
+            diamond_price = round(diamond_carat * diamond_rate_used, 2)
+            labour_price = round(LABOUR_CHARGE * weight, 2)
+
+            total_price = round(gold_price + diamond_price + labour_price, 2)
 
         except Exception as e:
-            total_price = f"Error: {str(e)}"
+            total_price = None
+            print("❌ Error in calculation:", e)
 
     return render_template(
         "index.html",
         purity_multipliers=PURITY_MULTIPLIERS,
         total_price=total_price,
+        latest_gold_rate=latest_gold_rate,
         gold_rate=gold_rate_per_gram,
         purity=purity_selected,
         diamond_rates=DIAMOND_RATES,
-        diamond_rate_selected=diamond_rate_selected
+        diamond_rate_option=diamond_rate_option,
+        diamond_rate=diamond_rate_used,
+        diamond_carat=diamond_carat,
+        labour_charge=LABOUR_CHARGE,
+        weight=weight
     )
 
 
