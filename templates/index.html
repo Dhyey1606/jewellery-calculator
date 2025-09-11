@@ -264,58 +264,60 @@ document.addEventListener("DOMContentLoaded", function() {
         <h1>Beyond Karat</h1>
         <p>Jewellery Price Calculator</p>
 
-        <form method="POST">
-        <label for="gold_rate_option">Gold Rate Option:</label>
-        <select id="gold_rate_option" name="gold_rate_option" required onchange="toggleManualGold(this.value)">
-        <option value="Live" {% if gold_rate_option == "Live" %}selected{% endif %}>Live (DB)</option>
+<form method="POST">
+    <label for="gold_rate_option">Gold Rate Option:</label>
+    <select id="gold_rate_option" name="gold_rate_option" required onchange="toggleManualGold(this.value)">
+        <option value="Live" {% if gold_rate_option == "Live" %}selected{% endif %}>Live</option>
         <option value="Manual" {% if gold_rate_option == "Manual" %}selected{% endif %}>Manual</option>
-        </select>
+    </select>
 
-        <div id="manual_gold_div" style="display: none; margin-top:10px;">
+    <div id="manual_gold_div" style="display: none; margin-top:10px;">
         <label for="gold_rate_manual">Enter Gold Rate Manually (per gram 24K):</label>
         <input type="number" step="0.01" id="gold_rate_manual" name="gold_rate_manual"
-        value="{{ request.form.get('gold_rate_manual', '') }}">
+               value="{{ request.form.get('gold_rate_manual', '') }}">
     </div>
 
+    <label for="purity">Select Purity:</label>
+    <select id="purity" name="purity" required>
+        {% for k, v in purity_multipliers.items() %}
+        <option value="{{ k }}" {% if purity == k %}selected{% endif %}>{{ k }}</option>
+        {% endfor %}
+    </select>
 
-            <label for="purity">Select Purity:</label>
-            <select id="purity" name="purity" required>
-                {% for k, v in purity_multipliers.items() %}
-                <option value="{{ k }}" {% if purity == k %}selected{% endif %}>{{ k }}</option>
-                {% endfor %}
-            </select>
+    <!-- ✅ Gold weight input restored -->
+    <label for="weight">Gold Weight (grams):</label>
+    <input type="number" step="0.01" id="weight" name="weight" required
+           value="{{ request.form.get('weight', '') }}">
 
-            <label for="diamond_rate_option">Diamond Rate Option:</label>
-            <select id="diamond_rate_option" name="diamond_rate_option" required onchange="toggleManualDiamond(this.value)">
-                {% for k, v in diamond_rates.items() %}
-                <option value="{{ k }}" {% if diamond_rate_option == k %}selected{% endif %}>
-                    {{ k }}
-                </option>
-                {% endfor %}
-            </select>
+    <label for="diamond_rate_option">Diamond Rate Option:</label>
+    <select id="diamond_rate_option" name="diamond_rate_option" required onchange="toggleManualDiamond(this.value)">
+        {% for k, v in diamond_rates.items() %}
+        <option value="{{ k }}" {% if diamond_rate_option == k %}selected{% endif %}>
+            {{ k }}
+        </option>
+        {% endfor %}
+    </select>
 
-            <div id="manual_diamond_div" style="display: none; margin-top:10px;">
-                <label for="diamond_rate_manual">Enter Diamond Rate Manually:</label>
-                <input type="number" step="0.01" id="diamond_rate_manual" name="diamond_rate_manual"
-                    value="{{ request.form.get('diamond_rate_manual', '') }}">
-            </div>
+    <div id="manual_diamond_div" style="display: none; margin-top:10px;">
+        <label for="diamond_rate_manual">Enter Diamond Rate Manually:</label>
+        <input type="number" step="0.01" id="diamond_rate_manual" name="diamond_rate_manual"
+               value="{{ request.form.get('diamond_rate_manual', '') }}">
+    </div>
 
-            <label for="diamond_carat">Diamond Weight (carats):</label>
-            <input type="number" step="0.01" id="diamond_carat" name="diamond_carat" required
-                value="{{ request.form.get('diamond_carat', '') }}">
+    <label for="diamond_carat">Diamond Weight (carats):</label>
+    <input type="number" step="0.01" id="diamond_carat" name="diamond_carat" required
+           value="{{ request.form.get('diamond_carat', '') }}">
 
-            <button type="submit">Calculate</button>
-        </form>
+    <button type="submit">Calculate</button>
+</form>
 
-        {% if total_price %}
-        <div class="result">
-            <p><strong>💎 Estimated Price:</strong> ₹ {{ "%.2f"|format(total_price) }}</p>
-            <p>Gold Rate (24K): ₹ {{ "%.2f"|format(latest_gold_rate) }}/g</p>
-            <p>Purity: {{ purity }} (Effective Gold Rate: ₹ {{ "%.2f"|format(gold_rate) }}/g)</p>
-            <p>Diamond Rate: ₹ {{ "%.2f"|format(diamond_rate) }}/ct × {{ diamond_carat }}ct</p>
-            <p>Labour Charge: ₹ {{ "%.2f"|format(labour_charge) }} × {{ weight }}g</p>
-        </div>
-        {% endif %}
+{% if total_price is not none %}
+<div class="result">
+    💎 Estimated Price: ₹ {{ "%.2f"|format(total_price) }}<br>
+    (Purity: {{ purity }}, Gold Rate/g: ₹ {{ "%.2f"|format(gold_rate) }})
+</div>
+{% endif %}
+
     </div>
 
 <script>
