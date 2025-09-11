@@ -265,9 +265,18 @@ document.addEventListener("DOMContentLoaded", function() {
         <p>Jewellery Price Calculator</p>
 
         <form method="POST">
-            <label for="weight">Gold Weight (grams):</label>
-            <input type="number" step="0.01" id="weight" name="weight" required
-                value="{{ request.form.get('weight', '') }}">
+        <label for="gold_rate_option">Gold Rate Option:</label>
+        <select id="gold_rate_option" name="gold_rate_option" required onchange="toggleManualGold(this.value)">
+        <option value="Live" {% if gold_rate_option == "Live" %}selected{% endif %}>Live (DB)</option>
+        <option value="Manual" {% if gold_rate_option == "Manual" %}selected{% endif %}>Manual</option>
+        </select>
+
+        <div id="manual_gold_div" style="display: none; margin-top:10px;">
+        <label for="gold_rate_manual">Enter Gold Rate Manually (per gram 24K):</label>
+        <input type="number" step="0.01" id="gold_rate_manual" name="gold_rate_manual"
+        value="{{ request.form.get('gold_rate_manual', '') }}">
+    </div>
+
 
             <label for="purity">Select Purity:</label>
             <select id="purity" name="purity" required>
@@ -314,9 +323,15 @@ function toggleManualDiamond(value) {
     const manualDiv = document.getElementById('manual_diamond_div');
     manualDiv.style.display = (value === "Manual") ? 'block' : 'none';
 }
+
+function toggleManualGold(value) {
+    const manualDiv = document.getElementById('manual_gold_div');
+    manualDiv.style.display = (value === "Manual") ? 'block' : 'none';
+}
+
 document.addEventListener("DOMContentLoaded", function() {
     toggleManualDiamond(document.getElementById('diamond_rate_option').value);
-});
-</script>
+    toggleManualGold(document.getElementById('gold_rate_option').value);
+});</script>
 </body>
 </html>

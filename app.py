@@ -162,32 +162,92 @@ PURITY_MULTIPLIERS = {
 }
 
 
+# @app.route("/", methods=["GET", "POST"])
+# def index():
+#     total_price = None
+#     gold_rate_per_gram = None
+#     purity_selected = request.form.get("purity") if request.method == "POST" else None
+#     diamond_rate_option = request.form.get("diamond_rate_option") if request.method == "POST" else None
+#     diamond_rate_used = None
+#     diamond_carat = 0
+#     weight = 0
+
+#     latest_gold_rate = get_latest_gold_rate()
+
+#     if request.method == "POST" and latest_gold_rate:
+#         try:
+#             weight = float(request.form.get("weight", 0))
+#             purity_selected = request.form.get("purity", "24K")
+#             diamond_carat = float(request.form.get("diamond_carat", 0))
+
+#             # Diamond rate selection
+#             if diamond_rate_option == "Manual":
+#                 diamond_rate_used = float(request.form.get("diamond_rate_manual", 0))
+#             else:
+#                 diamond_rate_used = DIAMOND_RATES.get(diamond_rate_option, 0)
+
+#             # Calculate prices
+#             gold_rate_per_gram = round(latest_gold_rate * PURITY_MULTIPLIERS.get(purity_selected, 1.0), 2)
+#             gold_price = round(weight * gold_rate_per_gram, 2)
+#             diamond_price = round(diamond_carat * diamond_rate_used, 2)
+#             labour_price = round(LABOUR_CHARGE * weight, 2)
+
+#             total_price = round(gold_price + diamond_price + labour_price, 2)
+
+#         except Exception as e:
+#             total_price = None
+#             print("❌ Error in calculation:", e)
+
+#     return render_template(
+#         "index.html",
+#         purity_multipliers=PURITY_MULTIPLIERS,
+#         total_price=total_price,
+#         latest_gold_rate=latest_gold_rate,
+#         gold_rate=gold_rate_per_gram,
+#         purity=purity_selected,
+#         diamond_rates=DIAMOND_RATES,
+#         diamond_rate_option=diamond_rate_option,
+#         diamond_rate=diamond_rate_used,
+#         diamond_carat=diamond_carat,
+#         labour_charge=LABOUR_CHARGE,
+#         weight=weight
+#     )
+
+
 @app.route("/", methods=["GET", "POST"])
 def index():
     total_price = None
     gold_rate_per_gram = None
     purity_selected = request.form.get("purity") if request.method == "POST" else None
     diamond_rate_option = request.form.get("diamond_rate_option") if request.method == "POST" else None
+    gold_rate_option = request.form.get("gold_rate_option") if request.method == "POST" else "Live"
     diamond_rate_used = None
     diamond_carat = 0
     weight = 0
 
     latest_gold_rate = get_latest_gold_rate()
 
-    if request.method == "POST" and latest_gold_rate:
+    if request.method == "POST":
         try:
             weight = float(request.form.get("weight", 0))
             purity_selected = request.form.get("purity", "24K")
             diamond_carat = float(request.form.get("diamond_carat", 0))
 
-            # Diamond rate selection
+            # ✅ Diamond rate logic
             if diamond_rate_option == "Manual":
                 diamond_rate_used = float(request.form.get("diamond_rate_manual", 0))
             else:
                 diamond_rate_used = DIAMOND_RATES.get(diamond_rate_option, 0)
 
+            # ✅ Gold rate logic
+            if gold_rate_option == "Manual":
+                manual_gold_rate = float(request.form.get("gold_rate_manual", 0))
+                base_gold_rate = manual_gold_rate
+            else:
+                base_gold_rate = latest_gold_rate
+
             # Calculate prices
-            gold_rate_per_gram = round(latest_gold_rate * PURITY_MULTIPLIERS.get(purity_selected, 1.0), 2)
+            gold_rate_per_gram = round(base_gold_rate * PURITY_MULTIPLIERS.get(purity_selected, 1.0), 2)
             gold_price = round(weight * gold_rate_per_gram, 2)
             diamond_price = round(diamond_carat * diamond_rate_used, 2)
             labour_price = round(LABOUR_CHARGE * weight, 2)
@@ -210,7 +270,8 @@ def index():
         diamond_rate=diamond_rate_used,
         diamond_carat=diamond_carat,
         labour_charge=LABOUR_CHARGE,
-        weight=weight
+        weight=weight,
+        gold_rate_option=gold_rate_option
     )
 
 
