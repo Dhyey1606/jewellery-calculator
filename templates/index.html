@@ -245,7 +245,10 @@ document.addEventListener("DOMContentLoaded", function() {
             font-size: 1rem;
             color: #333;
             font-weight: 600;
-            text-align: left;
+            text-align: center;   /* ✅ Center text */
+            display: inline-block; /* ✅ shrink to fit */
+            margin-left: auto;
+            margin-right: auto;
         }
 
         .result strong { color: #a47c48; }
@@ -261,7 +264,10 @@ document.addEventListener("DOMContentLoaded", function() {
 </head>
 <body>
     <div class="container">
-        <h1>Beyond Karat</h1>
+        <img src="{{ url_for('static', filename='beyondkaratlogo.png') }}" 
+         alt="Beyond Karat Logo"
+         style="width: 120px; margin-bottom: 15px;">
+        <h1 style="display:none;">Beyond Karat</h1>
         <p>Jewellery Price Calculator</p>
 
 <form method="POST">
@@ -312,9 +318,11 @@ document.addEventListener("DOMContentLoaded", function() {
 </form>
 
 {% if total_price is not none %}
-<div class="result">
-    💎 Estimated Price: ₹ {{ "%.2f"|format(total_price) }}<br>
-    (Purity: {{ purity }}, Gold Rate/g: ₹ {{ "%.2f"|format(gold_rate) }})
+<div style="display: flex; justify-content: center;">
+    <div class="result">
+        💎 Estimated Price: ₹ {{ "%.2f"|format(total_price) }}<br>
+        (Purity: {{ purity }}, Gold Rate/g: ₹ {{ "%.2f"|format(gold_rate) }})
+    </div>
 </div>
 {% endif %}
 
