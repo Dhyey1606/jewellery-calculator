@@ -288,10 +288,11 @@ document.addEventListener("DOMContentLoaded", function() {
 
         {% if total_price %}
         <div class="result">
-        💎 Estimated Price: ₹ {{ total_price }}<br>
-        (Purity: {{ purity }}, Gold Rate/g: ₹ {{ gold_rate }})
+        💎 Estimated Price: ₹ {{ "%.2f"|format(total_price) }}<br>
+        (Purity: {{ purity }}, Gold Rate/g: ₹ {{ "%.2f"|format(gold_rate) }})
         </div>
         {% endif %}
+
     </div>
 
 <script>
