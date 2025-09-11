@@ -121,6 +121,7 @@ from flask import Flask, render_template, request
 import os
 import subprocess
 import sqlite3
+import sys
 from db import init_db, get_connection
 
 # init db on app start
@@ -208,7 +209,7 @@ def update_rates():
         return "Unauthorized", 403
 
     try:
-        subprocess.run(["python", "update_rates.py"], check=True)
+        subprocess.run([sys.executable, "update_rates.py"], check=True)
         new_rate = get_latest_gold_rate()
         return f"✅ Gold rate updated to ₹{new_rate:.2f}/gram", 200
     except Exception as e:
