@@ -261,6 +261,20 @@ document.addEventListener("DOMContentLoaded", function() {
             input, select, button { font-size: 0.95rem; padding: 10px; }
         }
     </style>
+    <!-- favicon -->
+    <link rel="icon" href="{{ url_for('static', filename='icons/favicon.ico') }}" type="image/x-icon">
+
+    <!-- general icons -->
+    <link rel="icon" type="image/png" sizes="192x192" href="{{ url_for('static', filename='icons/logo-192.png') }}">
+    <link rel="icon" type="image/png" sizes="512x512" href="{{ url_for('static', filename='icons/logo-512.png') }}">
+
+    <!-- Apple iOS -->
+    <link rel="apple-touch-icon" sizes="180x180" href="{{ url_for('static', filename='icons/apple-touch-icon.png') }}">
+
+    <!-- PWA manifest -->
+    <link rel="manifest" href="{{ url_for('static', filename='icons/manifest.json') }}">
+    <meta name="theme-color" content="#ffffff">
+
 </head>
 <body>
     <div class="container">
