@@ -52,7 +52,7 @@ def fetch_gold_rate():
     for line in data.splitlines():
         if "GOLD 999 IMP" in line:
             parts = line.split()
-            raw_rate = float(parts[8])   # value is for 10 grams
+            raw_rate = float(parts[7])   # value is for 10 grams
             per_gram_rate = raw_rate / 10
             return round(per_gram_rate, 2)   # round to 2 decimals
 
