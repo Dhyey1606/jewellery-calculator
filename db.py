@@ -5,8 +5,14 @@ import psycopg2
 DATABASE_URL = os.environ.get("DATABASE_URL")
 
 def get_connection():
-    # sslmode goes in the connect() call, not in get()
-    return psycopg2.connect(DATABASE_URL, sslmode="require")
+    if not DATABASE_URL:
+        raise ValueError("DATABASE_URL environment variable is not set!")
+    
+    if not DATABASE_URL.startswith("postgresql://"):
+        raise ValueError(f"Invalid DATABASE_URL format: {DATABASE_URL[:20]}...")
+    
+    # Connection string already has sslmode=require, so don't add it again
+    return psycopg2.connect(DATABASE_URL)
 
 def init_db():
     conn = get_connection()
