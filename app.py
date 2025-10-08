@@ -102,6 +102,11 @@ def index():
     )
 
 
+# Health check endpoint for keep-alive pings
+@app.route("/health")
+def health():
+    return "OK", 200
+
 # 🔹 Cron trigger
 @app.route("/update-rates")
 def update_rates():
